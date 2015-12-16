@@ -1,5 +1,8 @@
 ##COBS metaG multivariate walkthrough
 
+[nmds]: https://raw.githubusercontent.com/ryanjw/COBS_all_metaG_analysis/master/walkthrough/nmds.jpg
+
+
 We are going to walkthrough some basic multivariate analysis that can help with analyzing metagenomes and any other multivariate dataset.
 
 Our goals are to:
@@ -38,3 +41,7 @@ Look at a subset of the data using `head()`, `tail()`, `str()`, and `dim()`.  Se
 dataset[1:5,10:15]
 ```
 ##Our first visualization##
+
+
+##Nonmetric multidimensional scaling##
+![alt text][nmds]
