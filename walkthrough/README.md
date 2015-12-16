@@ -13,3 +13,9 @@ Our goals are to:
 4. Generate multivariate statistics
 
 ##Step 1##
+- Navigate to anl5 and the path
+``
+ssh anl5
+cd /mnt/data1/rjw_COBS_analysis/COBS_all_metaG_analysis/data
+``
+Now we will run R by simply typing `R`
