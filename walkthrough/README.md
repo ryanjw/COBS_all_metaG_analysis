@@ -27,3 +27,14 @@ We are now in a remote R environment.  Think of this as your 'data crunching spa
 Look at the dataset before going into R (in other words type ``quit()`` if you are currently in the R environment).  There are a variety of ways to do this.
 
 What do you notice about this file?  How is it organized?  How is it delimited?
+
+Go into the R environment and read in the data with ``read.table()``...it'll go something like this
+```
+dataset<-read.table("...path\to\file...", sep="\t",header=TRUE)
+```
+Look at a subset of the data using `head()`, `tail()`, `str()`, and `dim()`.  Select a subset of the data using indexes like this
+```
+# I want only the first five rows and columns 10 through 15
+dataset[1:5,10:15]
+```
+##Our first visualization##
