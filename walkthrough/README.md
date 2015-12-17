@@ -1,7 +1,7 @@
 ##COBS metaG multivariate walkthrough
 
 [nmds]: https://raw.githubusercontent.com/ryanjw/COBS_all_metaG_analysis/master/walkthrough/nmds.jpg
-[pcoa]:
+[pcoa_no_arrows]: https://raw.githubusercontent.com/ryanjw/COBS_all_metaG_analysis/master/walkthrough/pcoa_no_arrows.jpg
 
 We are going to walkthrough some basic multivariate analysis that can help with analyzing metagenomes and any other multivariate dataset.
 
@@ -187,3 +187,4 @@ Now plot it
 ```
 ggplot()+geom_polygon(data=hull_data_pcoa,aes(x=MDS1,y=MDS2,fill=SoilFrac,group=SoilFrac),alpha=0.3)+geom_point(data=pcoa_sites,aes(x=MDS1,y=MDS2,shape=SoilFrac,colour=SoilFrac),size=4)+theme_bw(base_size=15)+theme(aspect.ratio=1)+scale_colour_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_fill_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_shape_discrete(name="Soil\nFraction")
 ```
+![alt text][pcoa_no_arrows]
