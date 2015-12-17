@@ -204,3 +204,9 @@ anova(pcoa,strata=dataset$block)
 anova(pcoa)
 # Note the difference when including block
 ```
+Clearly there is something up with these Medium samples, does anyone know how to figure out why?  Any ideas?
+
+#Next steps
+1. Deal with Medium issue
+2. Repeat analyses
+3. Find out what's driving the relationships
