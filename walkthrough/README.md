@@ -60,7 +60,62 @@ First, we want to pull out the cartesian coordinates for the nmds (where in 2d s
 results<-data.frame(dataset[,1:5],scores(nmds))
 write.table(".../path/to/write/to...",sep="\t",row.names=F)
 ```
+Now before we plot this NMDS, let's try to get some quantitative ideas about what we should expect to see.
 
+Are differences between aggregates significant? -> using PERMANOVA aka ``adonis()``
+More specifically, in N-dimensions, are groups of samples distinct?
+```
+adonis(decostand(dataset[,-c(1:5)],"total")~dataset$SoilFrac, strata=dataset$block)
+
+```
+Are some aggregates more variable than one another? -> using tests of beta diversity aka ``betadisper()``
+```
+b_results<-betadisper(decostand(dataset[,-c(1:5)],"total"),"median")
+anova(b_results)
+TukeyHSD(b_results)
+```
+We have some idea now of how things should look.  
+
+Now we are going to copy this securely to our local machine with ``scp``.
+Go into your terminal and do this command
+
+```
+scp anl5:/path/to/nmds/results/ ~/path/i/want/it/at/on/local/machine
+```
+Now we are going to open R on our local machine and plot.
+
+```
+# read in the ggplot2 library
+library(ggplot2)
+#read in the data
+nmds_info<-read.table("/path/to/nmds/stuff", sep="\t", header=TRUE)
+ggplot(mds)+geom_point(aes(x=NMDS1,y=NMDS2,colour=SoilFrac))+theme(aspect.ratio=1)
+```
+
+Is this what we expect?
+
+If not, how can we fix it?
 
 ##Nonmetric multidimensional scaling##
+Now we are going to make a fancier NMDS like we are trying to get a pub or impress our friends (or both)
+```
+# read in this additional library
+library(RColorBrewer)
+```
+It would be nice to shade in areas between points so we can see which groups of samples 'own' that space.  We will do this using ``chull()``.  If you pass this function a series of points, it will create a shape with these points and return all of those that are on the outside edges.
+
+```
+# We can do this simply
+micro_hull<-nmds[nmds$SoilFrac=="Micro",][chull(nmds[nmds$SoilFrac=="Micro",c("NMDS1","NMDS2")]),]
+
+#or we can do this in one loop
+hull_data<-data.frame()
+for(i in 1:length(unique(nmds$SoilFrac))){
+	new_row<-nmds[nmds$SoilFrac==as.vector(unique(nmds$SoilFrac)[i]),][chull(nmds[nmds$SoilFrac==as.vector(unique(nmds$SoilFrac)[i]),c("NMDS1","NMDS2")]),]
+	hull_data<-rbind(hull_data,new_row)
+}
+```
+Though this loop looks complicated, it only really involves subsetting and applying the ``chull()`` function...not that dange`R`ous.
+
+
 ![alt text][nmds]
