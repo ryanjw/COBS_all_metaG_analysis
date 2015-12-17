@@ -41,6 +41,25 @@ Look at a subset of the data using `head()`, `tail()`, `str()`, and `dim()`.  Se
 dataset[1:5,10:15]
 ```
 ##Our first visualization##
+We will first look at how similar our samples are to one another through a visualization called non-metric multidimensional scaling (NMDS).  This visualization tries to represent the similarity between samples in a reduced number of dimensions.
+
+We will first do this based on relative abundance within each sample, note that this can be done in other ways...
+```
+dataset_trans<-decostand(dataset[,-c(1:5)],"total")
+nmds<-metaMDS(dataset_trans, k=2, method="bray", autotransform=FALSE)
+
+# Note that you can nest these functions
+nmds<-metaMDS(decostand(dataset[,-c(1:5)],"total"),k=2,method="bray",autotransform=FALSE)
+
+```
+There are several ways to plot this...we are going to use the ggplot2 library to produce a plot in our 'studio'.
+
+First, we want to pull out the cartesian coordinates for the nmds (where in 2d space these points exist)
+```
+# notice that I am putting all the metadata in a dataframe with the scores so I can use this information in the plot
+results<-data.frame(dataset[,1:5],scores(nmds))
+write.table(".../path/to/write/to...",sep="\t",row.names=F)
+```
 
 
 ##Nonmetric multidimensional scaling##
