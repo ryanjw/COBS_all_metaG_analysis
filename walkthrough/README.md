@@ -31,9 +31,10 @@ Look at the dataset before going into R (in other words type ``quit()`` if you a
 
 What do you notice about this file?  How is it organized?  How is it delimited?
 
-Go into the R environment and read in the data with ``read.table()``...it'll go something like this
+Go into the R environment and read in the data with ``fread()`` from the `data.table` library...it'll go something like this
 ```
-dataset<-read.table("...path\to\file...", sep="\t",header=TRUE)
+library(data.table)
+dataset<-fread("COBS_round1_metaG_mgrast_annotation_data_matrix.txt",sep="\t",header=TRUE, data.table=FALSE)
 ```
 Look at a subset of the data using `head()`, `tail()`, `str()`, and `dim()`.  Select a subset of the data using indexes like this
 ```
@@ -168,6 +169,12 @@ pcoa_species<-data.frame(dataset[,1:5],scores(pcoa)$species)
 ```
 Note that there are `sites`, which refer to the location of points while `species` refer to the head of a vector representing the direction of variation for a particular variable originating from (0,0)
 
+We can also figure out how much variance is explained in each orthogonal dimension (e.g. axis 1, axis 2, etc.)
+```
+var_explained<-eigenvals(pcoa)/sum(eigenvals(pcoa))
+```
+If we look at this object, we can see how much variance is explained in each direction
+
 Let's make hulls and organize as we did previously
 ```
 hull_data_pcoa<-data.frame()
@@ -185,6 +192,6 @@ levels(hull_data_pcoa$SoilFrac)<-c("Micro","Small","Medium","Large","Whole Soil"
 
 Now plot it
 ```
-ggplot()+geom_polygon(data=hull_data_pcoa,aes(x=MDS1,y=MDS2,fill=SoilFrac,group=SoilFrac),alpha=0.3)+geom_point(data=pcoa_sites,aes(x=MDS1,y=MDS2,shape=SoilFrac,colour=SoilFrac),size=4)+theme_bw(base_size=15)+theme(aspect.ratio=1)+scale_colour_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_fill_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_shape_discrete(name="Soil\nFraction")
+ggplot()+geom_polygon(data=hull_data_pcoa,aes(x=MDS1,y=MDS2,fill=SoilFrac,group=SoilFrac),alpha=0.3)+geom_point(data=pcoa_sites,aes(x=MDS1,y=MDS2,shape=SoilFrac,colour=SoilFrac),size=4)+theme_bw(base_size=15)+theme(aspect.ratio=1)+scale_colour_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_fill_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_shape_discrete(name="Soil\nFraction")+labs(x="MDS1 (35% var. explained)",y="MDS2 (16% var. explained)")
 ```
 ![alt text][pcoa_no_arrows]
