@@ -165,7 +165,7 @@ Now we are going to do something similar to the NMDS steps by extracting `scores
 
 ```
 pcoa_sites<-data.frame(dataset[,1:5],scores(pcoa)$sites)
-pcoa_species<-data.frame(dataset[,1:5],scores(pcoa)$species)
+pcoa_species<-data.frame(rownames(scores(pcoa)$species),scores(pcoa)$species)
 ```
 Note that there are `sites`, which refer to the location of points while `species` refer to the head of a vector representing the direction of variation for a particular variable originating from (0,0)
 
@@ -195,3 +195,12 @@ Now plot it
 ggplot()+geom_polygon(data=hull_data_pcoa,aes(x=MDS1,y=MDS2,fill=SoilFrac,group=SoilFrac),alpha=0.3)+geom_point(data=pcoa_sites,aes(x=MDS1,y=MDS2,shape=SoilFrac,colour=SoilFrac),size=4)+theme_bw(base_size=15)+theme(aspect.ratio=1)+scale_colour_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_fill_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_shape_discrete(name="Soil\nFraction")+labs(x="MDS1 (35% var. explained)",y="MDS2 (16% var. explained)")
 ```
 ![alt text][pcoa_no_arrows]
+
+We can also determine how much variation is explained by specific experimental factors.  This is Constrained Analysis of Principal Coordinates (CAP) (similar to something called Redundancy Analysis (RDA))
+```
+pcoa<-capscale(decostand(dataset[,-c(1:5)],"total")~dataset$SoilFrac,dist="bray")
+summary(pcoa)
+anova(pcoa,strata=dataset$block)
+anova(pcoa)
+# Note the difference when including block
+```
