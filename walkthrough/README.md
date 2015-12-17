@@ -1,7 +1,7 @@
 ##COBS metaG multivariate walkthrough
 
 [nmds]: https://raw.githubusercontent.com/ryanjw/COBS_all_metaG_analysis/master/walkthrough/nmds.jpg
-
+[pcoa]:
 
 We are going to walkthrough some basic multivariate analysis that can help with analyzing metagenomes and any other multivariate dataset.
 
@@ -45,6 +45,7 @@ We will first look at how similar our samples are to one another through a visua
 
 We will first do this based on relative abundance within each sample, note that this can be done in other ways...
 ```
+library(vegan)
 dataset_trans<-decostand(dataset[,-c(1:5)],"total")
 nmds<-metaMDS(dataset_trans, k=2, method="bray", autotransform=FALSE)
 
@@ -149,3 +150,40 @@ ggplot()+geom_polygon(data=hull_data,aes(x=NMDS1,y=NMDS2,fill=SoilFrac,group=Soi
 ```
 
 ![alt text][nmds]
+
+##Principal coordinates analysis##
+
+We may also want to look at which groups of variables are changing the most across the samples and are therefore potentially driving differences between groups of samples.  One way to do this is Principal coordinates analysis (PCoA).  This is a distance-based approach; therefore there are less assumptions needed for the data than Principal Components Analysis (PCA).  Instead, if you do a PCoA with euclidian distance, it is identical to PCA.  IMO you should do a PCoA only since PCA can essentially be a special case of PCoA.  
+
+So lets get to it...we are going to use the ``capscale()`` function from the `vegan()` library
+
+```
+pcoa<-capscale(decostand(dataset[,-c(1:5)],"total")~1,dist="bray")
+```
+Now we are going to do something similar to the NMDS steps by extracting `scores` from the `pcoa` object
+
+```
+pcoa_sites<-data.frame(dataset[,1:5],scores(pcoa)$sites)
+pcoa_species<-data.frame(dataset[,1:5],scores(pcoa)$species)
+```
+Note that there are `sites`, which refer to the location of points while `species` refer to the head of a vector representing the direction of variation for a particular variable originating from (0,0)
+
+Let's make hulls and organize as we did previously
+```
+hull_data_pcoa<-data.frame()
+for(i in 1:length(unique(pcoa_sites$SoilFrac))){
+	new_row<-pcoa_sites[pcoa_sites$SoilFrac==as.vector(unique(pcoa_sites$SoilFrac)[i]),][chull(pcoa_sites[pcoa_sites$SoilFrac==as.vector(unique(pcoa_sites$SoilFrac)[i]),c("MDS1","MDS2")]),]
+	hull_data_pcoa<-rbind(hull_data_pcoa,new_row)
+}
+
+pcoa_sites$SoilFrac<-factor(pcoa_sites$SoilFrac,levels=c("Micro","SM","MM","LM","WS"))
+levels(pcoa_sites$SoilFrac)<-c("Micro","Small","Medium","Large","Whole Soil")
+
+hull_data_pcoa$SoilFrac<-factor(hull_data_pcoa$SoilFrac,levels=c("Micro","SM","MM","LM","WS"))
+levels(hull_data_pcoa$SoilFrac)<-c("Micro","Small","Medium","Large","Whole Soil")
+```
+
+Now plot it
+```
+ggplot()+geom_polygon(data=hull_data_pcoa,aes(x=MDS1,y=MDS2,fill=SoilFrac,group=SoilFrac),alpha=0.3)+geom_point(data=pcoa_sites,aes(x=MDS1,y=MDS2,shape=SoilFrac,colour=SoilFrac),size=4)+theme_bw(base_size=15)+theme(aspect.ratio=1)+scale_colour_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_fill_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_shape_discrete(name="Soil\nFraction")
+```
