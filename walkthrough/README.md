@@ -117,5 +117,35 @@ for(i in 1:length(unique(nmds$SoilFrac))){
 ```
 Though this loop looks complicated, it only really involves subsetting and applying the ``chull()`` function...not that dange`R`ous.
 
+Now some organizational stuff
+```
+nmds$SoilFrac<-factor(nmds$SoilFrac,levels=c("Micro","SM","MM","LM","WS"))
+levels(nmds$SoilFrac)<-c("Micro","Small","Medium","Large","Whole Soil")
+
+hull_data$SoilFrac<-factor(hull_data$SoilFrac,levels=c("Micro","SM","MM","LM","WS"))
+levels(hull_data$SoilFrac)<-c("Micro","Small","Medium","Large","Whole Soil")
+```
+What color palette would we like?
+```
+display.brewer.all(n=5)
+```
+
+Earlier we made a figure with only set of data, but now we have two (nmds and hull_data).  I am going to show you how to do this in a piece-wise manner.
+```
+#just the points alone
+ggplot()+geom_point(data=mds,aes(x=NMDS1,y=NMDS2,shape=SoilFrac,colour=SoilFrac),size=4)
+# just the hulls alone
+ggplot()+geom_polygon(data=hull_data,aes(x=NMDS1,y=NMDS2,fill=SoilFrac,group=SoilFrac),alpha=0.3)
+#putting them together is easy
+ggplot()+geom_polygon(data=hull_data,aes(x=NMDS1,y=NMDS2,fill=SoilFrac,group=SoilFrac),alpha=0.3)+geom_point(data=mds,aes(x=NMDS1,y=NMDS2,shape=SoilFrac,colour=SoilFrac),size=4)
+```
+Let's pretty it up
+```
+ggplot()+geom_polygon(data=hull_data,aes(x=NMDS1,y=NMDS2,fill=SoilFrac,group=SoilFrac),alpha=0.3)+geom_point(data=mds,aes(x=NMDS1,y=NMDS2,shape=SoilFrac,colour=SoilFrac),size=4)+theme_bw(base_size=20)+theme(aspect.ratio=1)+scale_colour_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_fill_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_shape_discrete(name="Soil\nFraction")
+```
+We had those statistics for the PERMANOVA, let's show put it in the plot so that the visualization is paired with quantitative info.
+```
+ggplot()+geom_polygon(data=hull_data,aes(x=NMDS1,y=NMDS2,fill=SoilFrac,group=SoilFrac),alpha=0.3)+geom_point(data=mds,aes(x=NMDS1,y=NMDS2,shape=SoilFrac,colour=SoilFrac),size=4)+theme_bw(base_size=20)+theme(aspect.ratio=1)+scale_colour_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_fill_manual(name="Soil\nFraction",values=brewer.pal(5,"Dark2"))+scale_shape_discrete(name="Soil\nFraction")+annotate("text",x=.25,y=.175,label="R[italic(pseudo)]^{2}==0.273~italic(P)==0.004",parse=TRUE)
+```
 
 ![alt text][nmds]
